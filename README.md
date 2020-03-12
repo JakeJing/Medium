@@ -1,2 +1,3 @@
-# Medium
-This repos. is used to save all the related scripts for my Medium blog.
+# Medium Scripts
+
+This repos. is used to save all scripts for my Medium blogs.

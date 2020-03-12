@@ -97,7 +97,7 @@ gg = gg + annotate("text", x = rep(left_corner, nrow(top) + 1),
     fontface = c("bold", rep("plain", nrow(top))))
 
 # add the death number
-right_corner = 10.2
+right_corner = 10.35
 gg = gg + annotate("text", x = rep(right_corner, nrow(death_num) + 1), 
      y = seq(from = 48.1, to = 47.1, by = -0.2)[1:(nrow(death_num) + 1)],
      label = c("Death", death_num$label), family = "Times",
