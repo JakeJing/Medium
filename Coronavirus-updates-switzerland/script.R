@@ -8,10 +8,11 @@ library(magrittr)
 library(ggpmisc)
 
 ## Coronavirus data
-data = read.csv("data-lR5wn.csv", header = T, 
+data = read.csv("data-lR5wn.csv", header = T,
                 sep = ",", as.is = T) %>% 
   select(Lon, Lat, Titel, Cases, Deaths) %>% 
   set_colnames(c("long", "lat", "canton", "cases", "death"))
+
 top = data %>% arrange(desc(cases)) %>%
   head(5) %>% select(canton, cases, death) %>%
   mutate(label = paste0(canton, ": ", cases))
@@ -56,6 +57,12 @@ map_df_merged$canton = recode(map_df_merged$canton,
        "Luzern" = "Lucerne", "Valais/Wallis" = "Valais")
 map_df_final = map_df_merged %>% 
   inner_join(., lang_canton_new, by = "canton")
+## add Romansh
+map_df_final[which(map_df_final$canton == "Graubünden"), "language"] = "Romansh"
+map_df_final$language = as.factor(map_df_final$language)
+map_df_final$language = factor(map_df_final$language, 
+                               levels = c("French", "German", 
+                               "Italian", "Romansh", "Mixed"))
 
 # 2 cantons without case
 unobserved = setdiff(unique(map_df_merged$canton), unique(data$canton))
@@ -64,16 +71,19 @@ print(paste("Safe region: ", paste(unobserved, collapse = ", ")))
 gg = ggplot() + geom_map(data=map_df_final, map=map_df_final,
                     aes(map_id=id, group=group, fill=language),
                     color="#ffffff", size=0.25) + 
-  scale_fill_manual(values = c("#f38ea2", "#808fde", 
-                              "#67d78f", "#b5b6bc")) +
+  coord_map(xlim = range(map_df$long) + c(-0.5, 0.5), 
+            ylim = range(map_df$lat) + c(-0.65, 0.65)) +
+  scale_fill_manual(values = c("French" = "#f38ea2", 
+                               "German" = "#808fde", 
+                               "Italian" = "#67d78f",
+                               "Romansh"= "#f2f390",
+                               "Mixed" = "#b5b6bc"))+
   geom_point(data = data, aes(x = long, y = lat,  
                  size = cases, alpha = 0.5), 
              shape = 21, color = 'black', 
              fill = "purple", stroke = .2, show.legend = F) +
   scale_size_continuous(range = c(2,13)) +
   geom_text(data=data, aes(label=canton, x=long, y=lat), size=2) + 
-  coord_map(xlim = range(map_df$long) + c(-0.5, 0.5), 
-            ylim = range(map_df$lat) + c(-0.65, 0.65)) +
   theme_map() + 
   labs(x="", y="", title="Coronavirus (COVID-19) in Switzerland",  
        subtitle = paste("Total confirmed cases:", sum(data$cases))) + 
@@ -97,10 +107,10 @@ gg = gg + annotate("text", x = rep(left_corner, nrow(top) + 1),
     fontface = c("bold", rep("plain", nrow(top))))
 
 # add the death number
-right_corner = 10.35
+right_corner = 10.4
 gg = gg + annotate("text", x = rep(right_corner, nrow(death_num) + 1), 
      y = seq(from = 48.1, to = 47.1, by = -0.2)[1:(nrow(death_num) + 1)],
-     label = c("Death", death_num$label), family = "Times",
+     label = c("Deaths", death_num$label), family = "Times",
      fontface = c("bold", rep("plain", nrow(death_num))))
 # save the plot and print it
 name = "corona.jpg"
