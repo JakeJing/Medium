@@ -106,12 +106,16 @@ gg = gg + annotate("text", x = rep(left_corner, nrow(top) + 1),
     label = c("Rank", top$label), family = "Times",
     fontface = c("bold", rep("plain", nrow(top))))
 
-# add the death number
-right_corner = 10.4
-gg = gg + annotate("text", x = rep(right_corner, nrow(death_num) + 1), 
-     y = seq(from = 48.1, to = 47.1, by = -0.2)[1:(nrow(death_num) + 1)],
-     label = c("Deaths", death_num$label), family = "Times",
-     fontface = c("bold", rep("plain", nrow(death_num))))
+# add death number
+if(nrow(death_num) > 0){
+  right_corner = 10.4
+  gg = gg + annotate("text", 
+            x = rep(right_corner, nrow(death_num) + 1), 
+            y = seq(from = 48.1, to = 47.1, by = -0.2)[1:(nrow(death_num) + 1)],
+            label = c(paste0("Deaths", " (", sum(data$death), ")"),
+                               death_num$label), family = "Times",
+            fontface = c("bold", rep("plain", nrow(death_num))))
+}
 # save the plot and print it
 name = "corona.jpg"
 ggsave(name, gg, width=8.5, height=5)
