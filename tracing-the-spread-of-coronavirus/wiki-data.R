@@ -9,7 +9,8 @@ library(ggpmisc)
 library(tidyr)
 
 ## get the longitudinal data from wiki
-data = htmltab("https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Switzerland", 2, rm_nodata_cols = F)
+data = htmltab("https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Switzerland", 3, rm_nodata_cols = F)
+
 colnames_recode = sapply(colnames(data), function(x){
   ifelse(grepl("Canton", x), strsplit(x, " >> ")[[1]][2], x)})
 data_rename = data %>% set_colnames(colnames_recode) %>% 
